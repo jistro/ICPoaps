@@ -1,0 +1,29 @@
+{
+  "canisters": {
+    "ICPoaps_backend": {
+      "main": "src/ICPoaps_backend/main.mo",
+      "type": "motoko"
+    },
+    "ICPoaps_frontend": {
+      "dependencies": [
+        "ICPoaps_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/ICPoaps_frontend/src/index.html"
+      },
+      "source": [
+        "src/ICPoaps_frontend/assets",
+        "dist/ICPoaps_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
