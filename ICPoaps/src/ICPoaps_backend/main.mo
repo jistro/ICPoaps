@@ -2,9 +2,11 @@ import Map "mo:base/HashMap";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
 import Bool "mo:base/Bool";
-import Buffer "mo:base/Buffer";
 import Debug "mo:base/Debug";
 import Error "mo:base/Error";
+import List "mo:base/List";
+import Buffer "mo:base/Buffer";
+import RBTree "mo:base/RBTree";
 
 actor {
   stable var counter = 1;
@@ -22,6 +24,8 @@ actor {
   type poapMinted = Nat;
   type userAddress = Text;
   type codePoap = Text;
+  type userId = Text;
+  type listPoap = List.List<idPoap>;
 
 
   type boolAnswer = Bool;
@@ -59,12 +63,14 @@ actor {
     id : Text; user : userAddress; code : Text;
   };
 
-  type UserMetadata = {
-    // como poder hacer una tabla para guardar los poaps que tiene cada usuario
+  type userPoaps = {
+    poaps : Buffer.Buffer<Text>;
   };
+  
+
 
   let POAP = Map.HashMap<idPoap, POAPmetadata>(0, Text.equal, Text.hash);
-  let User = Map.HashMap<userAddress, UserMetadata>(0, Text.equal, Text.hash);
+  let User = RBTree.RBTree<Text, Buffer.Buffer<Text> >(Text.compare);
 
   /// funcion que genera un nuevo poap y lo guarda en la tabla
   public func newPoap(metadata : metadataNewPOAP): async () {
@@ -186,6 +192,10 @@ actor {
     POAP.get(id);
   };
 
+  /*public query func getUser(id : Text): async  ?Buffer.Buffer<Text>{
+    User.get(id);
+  };*/
+
   
   public func mintPoap(prop : mintPoapData): () {
     let FoundPOAPMetadata = POAP.get(prop.id);
@@ -225,10 +235,36 @@ actor {
         Debug.trap("Wrong password");
       };
     };
+
+    
+    Debug.print("Check user");
+
+    var userDataAux = User.get(prop.user);
+    var foundUser = switch (userDataAux) {
+      case (null) {
+        Buffer.Buffer<Text>(0);
+      };
+      case (?userDataAux) userDataAux;
+    };
+    if (Buffer.isEmpty(foundUser)){
+      Debug.print("New user");
+      foundUser.add(prop.id);
+    } else {
+      Debug.print("Old user");
+
+      if (Buffer.contains<Text>(foundUser, prop.id, Text.equal)){
+        Debug.trap("User already has this POAP");
+      };
+      foundUser.add(prop.id);
+
+    };
+    ignore User.replace(prop.user, foundUser);
+    Debug.print("Add poap to user");
+
     var data = auxPoap.minted + 1; 
     Debug.print(Nat.toText data);
 
-    var newPoap = {
+    var updatePoap = {
       title = auxPoap.title;
       image = auxPoap.image;
       description = auxPoap.description;
@@ -242,8 +278,7 @@ actor {
       minted = data;
       code = auxPoap.code;
     };
-
-    ignore POAP.replace(prop.id, newPoap);
+    ignore POAP.replace(prop.id, updatePoap);
   };
 
 
