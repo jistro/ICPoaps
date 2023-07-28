@@ -2,14 +2,17 @@ import Map "mo:base/HashMap";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
 import Bool "mo:base/Bool";
+import Buffer "mo:base/Buffer";
 import Debug "mo:base/Debug";
+import Error "mo:base/Error";
 
 actor {
-  stable var counter = 0;
+  stable var counter = 1;
   type idPoap = Text;
   type titlePoap = Text;
   type imagePoap = Text;
   type descriptionPoap = Text;
+  type isCertificationPoap = Bool;
   type isOnlinePoap = Bool;
   type eventUrlPoap = Text;
   type eventCityPoap = Text;
@@ -20,12 +23,14 @@ actor {
   type userAddress = Text;
   type codePoap = Text;
 
+
   type boolAnswer = Bool;
 
   type POAPmetadata = {
     title : titlePoap;
     image : imagePoap;
     description : descriptionPoap;
+    isCertification : isCertificationPoap;
     isOnline : isOnlinePoap;
     eventUrl : eventUrlPoap;
     eventCity : eventCityPoap;
@@ -40,6 +45,7 @@ actor {
     title : titlePoap;
     image : imagePoap;
     description : descriptionPoap;
+    isCertification : isCertificationPoap;
     isOnline : isOnlinePoap;
     eventUrl : eventUrlPoap;
     eventCity : eventCityPoap;
@@ -54,61 +60,132 @@ actor {
   };
 
   type UserMetadata = {
-    poaps : Map.HashMap<idPoap, POAPmetadata>;
     // como poder hacer una tabla para guardar los poaps que tiene cada usuario
   };
 
   let POAP = Map.HashMap<idPoap, POAPmetadata>(0, Text.equal, Text.hash);
   let User = Map.HashMap<userAddress, UserMetadata>(0, Text.equal, Text.hash);
 
+  /// funcion que genera un nuevo poap y lo guarda en la tabla
   public func newPoap(metadata : metadataNewPOAP): async () {
-      assert metadata.mintLimit > 0;
-      var NEWpoap = {
-        title = metadata.title;
-        image = metadata.image;
-        description = metadata.description;
-        isOnline = metadata.isOnline;
-        eventUrl = metadata.eventUrl;
-        eventCity = metadata.eventCity;
-        eventCountry = metadata.eventCountry;
-        eventDate = metadata.eventDate;
-        mintLimit = metadata.mintLimit;
-        minted = 0;
-        code = metadata.code;
+      if  (metadata.mintLimit <= 0) {
+        Debug.trap("You must enter a mint limit");
+      };
+      if (metadata.title == "") {
+        Debug.trap("You must enter a title");
+      };
+      if (metadata.image == "") {
+        Debug.trap("You must enter a image");
+      };
+      if (metadata.description == "") {
+        Debug.trap("You must enter a description");
+      };
+    
+      /* 
+      * verifica si el poap es online o no, de ser online
+      * no se guarda la ciudad y el pais y de no serlo 
+      * se guarda la ciudad y el pais
+      */
+      if (metadata.isCertification){
+        if (metadata.isOnline) {
+          if (metadata.code == "") {
+            Debug.trap("The online certification must have a password");
+          };
+          var NEWpoap = {
+            title = metadata.title;
+            image = metadata.image;
+            description = metadata.description;
+            isCertification = true;
+            isOnline = true;
+            eventUrl = metadata.eventUrl;
+            eventCity = "";
+            eventCountry = "";
+            eventDate = metadata.eventDate;
+            mintLimit = metadata.mintLimit;
+            minted = 0;
+            code = metadata.code;
+          };
+          POAP.put(Nat.toText counter, NEWpoap);
+          Debug.print("POAP online created");
+          Debug.print(Nat.toText counter);
+        } else {
+          if (metadata.eventCity == "") {
+            Debug.trap("You irl POAP must have a city");
+          };
+          if (metadata.eventCountry == "") {
+            Debug.trap("You irl POAP must have a country");
+          };
+          var NEWpoap = {
+            title = metadata.title;
+            image = metadata.image;
+            description = metadata.description;
+            isCertification = true;
+            isOnline = false;
+            eventUrl = metadata.eventUrl;
+            eventCity = metadata.eventCity;
+            eventCountry = metadata.eventCountry;
+            eventDate = metadata.eventDate;
+            mintLimit = metadata.mintLimit;
+            minted = 0;
+            code = metadata.code;
+            
+          };
+          POAP.put(Nat.toText counter, NEWpoap);
+          Debug.print("POAP offline created");
+          Debug.print(Nat.toText counter);
+        };
+      } else {
+        if (metadata.isOnline) {
+          var NEWpoap = {
+            title = metadata.title;
+            image = metadata.image;
+            description = metadata.description;
+            isCertification = false;
+            isOnline = true;
+            eventUrl = metadata.eventUrl;
+            eventCity = "";
+            eventCountry = "";
+            eventDate = metadata.eventDate;
+            mintLimit = metadata.mintLimit;
+            minted = 0;
+            code = metadata.code;
+          };
+          POAP.put(Nat.toText counter, NEWpoap);
+          Debug.print("POAP online created");
+          Debug.print(Nat.toText counter);
+        } else {
+          if (metadata.eventCity == "") {
+            Debug.trap("You irl POAP must have a city");
+          };
+          if (metadata.eventCountry == "") {
+            Debug.trap("You irl POAP must have a country");
+          };
+          var NEWpoap = {
+            title = metadata.title;
+            image = metadata.image;
+            description = metadata.description;
+            isCertification = false;
+            isOnline = false;
+            eventUrl = metadata.eventUrl;
+            eventCity = metadata.eventCity;
+            eventCountry = metadata.eventCountry;
+            eventDate = metadata.eventDate;
+            mintLimit = metadata.mintLimit;
+            minted = 0;
+            code = metadata.code;
+          };
+          POAP.put(Nat.toText counter, NEWpoap);
+          Debug.print("POAP offline created");
+          Debug.print(Nat.toText counter);
+        };
       };
       counter += 1;
-      POAP.put(Nat.toText counter, NEWpoap);
-      Debug.print("POAP created");
-      Debug.print(Nat.toText counter);
-
   };
 
-  public func getPoap(id : Text): async ?POAPmetadata{
+  public query func getPoap(id : Text): async ?POAPmetadata{
     POAP.get(id);
   };
 
-  public func getPoapQuery(id : Text) : async POAPmetadata{
-    let FoundPOAPMetadata = POAP.get(id);
-    var thePoap = switch (FoundPOAPMetadata) {
-      case (null) {
-        {
-          title = "POAP not found";
-          image = "";
-          description = "";
-          isOnline = false;
-          eventUrl = "";
-          eventCity = "";
-          eventCountry = "";
-          eventDate = "";
-          mintLimit = 0;
-          minted = 0;
-          code = "";
-        };
-      };
-      case (?FoundPOAPMetadata) FoundPOAPMetadata;
-    };
-    return thePoap;
-  };
   
   public func mintPoap(prop : mintPoapData): () {
     let FoundPOAPMetadata = POAP.get(prop.id);
@@ -119,6 +196,7 @@ actor {
           title = "POAP not found";
           image = "";
           description = "";
+          isCertification = false;
           isOnline = false;
           eventUrl = "";
           eventCity = "";
@@ -134,10 +212,19 @@ actor {
 
     Debug.print(Nat.toText (auxPoap.mintLimit));
 
-    assert (auxPoap.mintLimit) != 0;
+    if (auxPoap.mintLimit == 0){
+      Debug.trap("Error 404: POAP not found");
+    };
     Debug.print("Pass null check");
-    assert auxPoap.minted <= auxPoap.mintLimit;
+    if (auxPoap.minted >= auxPoap.mintLimit){
+      Debug.trap("POAP mint limit reached");
+    };
     Debug.print("Pass minted check");
+    if (auxPoap.code != ""){
+      if (auxPoap.code != prop.code){
+        Debug.trap("Wrong password");
+      };
+    };
     var data = auxPoap.minted + 1; 
     Debug.print(Nat.toText data);
 
@@ -145,6 +232,7 @@ actor {
       title = auxPoap.title;
       image = auxPoap.image;
       description = auxPoap.description;
+      isCertification = auxPoap.isCertification;
       isOnline = auxPoap.isOnline;
       eventUrl = auxPoap.eventUrl;
       eventCity = auxPoap.eventCity;
