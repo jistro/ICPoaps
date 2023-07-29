@@ -60,12 +60,30 @@ actor {
     code : codePoap;
   };
 
+
   type mintPoapData = {
     id : Text; user : userAddress; code : Text;
   };
 
-  type userPoaps = {
-    poaps : Buffer.Buffer<Text>;
+
+  type getUserPoapListData = {
+    idUser : Text;
+    indexList : Nat;
+  };
+
+  type userPoapsMintedMetadata ={
+    title : titlePoap;
+    image : imagePoap;
+    description : descriptionPoap;
+    isCertification : isCertificationPoap;
+    isOnline : isOnlinePoap;
+    eventUrl : eventUrlPoap;
+    eventCity : eventCityPoap;
+    eventCountry : eventCountryPoap;
+    eventDate : eventDatePoap;
+    mintLimit : poapMintLimit;
+    minted : poapMinted;
+    code : codePoap;
   };
   
 
@@ -74,7 +92,7 @@ actor {
   let User = RBTree.RBTree<Text, Buffer.Buffer<Text> >(Text.compare);
 
   /// funcion que genera un nuevo poap y lo guarda en la tabla
-  public func newPoap(metadata : metadataNewPOAP): async () {
+  public func newPoap(metadata : metadataNewPOAP): async (Nat) {
       if  (metadata.mintLimit <= 0) {
         Debug.trap("You must enter a mint limit");
       };
@@ -187,28 +205,40 @@ actor {
         };
       };
       counter += 1;
+      return counter - 1;
   };
 
   public query func getPoap(id : Text): async ?POAPmetadata{
     POAP.get(id);
   };
 
-  ///@note nesecita agarrar cada id almacenado en el buffer del ususario, buscarlo y depues alamacenar unica y exclusivamente
+   ///@note nesecita agarrar cada id almacenado en el buffer del ususario, buscarlo y depues alamacenar unica y exclusivamente
   /// -nombre del poap
   /// -imagen del poap
   /// -descripcion del poap
   /// -si es certificacion o no
   /// -cantidad de poaps que se pueden mintear
   /// -cantidad de poaps que se mintearon
-  public query func getUser(id : Text): async POAPmetadata{
-    var userDataAux = User.get(id);
+  public query func getSizeListOfPoapMintedByUser(userID : userId): async Nat{
+    var userDataAux = User.get(userID);
     var foundUser = switch (userDataAux) {
       case (null) {
         Buffer.Buffer<Text>(0);
       };
       case (?userDataAux) userDataAux;
     };
-    var FoundPOAPMetadata = POAP.get(foundUser.get(0));
+    return foundUser.size();
+  };
+
+  public query func getPoapMintedByUserFromTheList(requestData : getUserPoapListData): async POAPmetadata{
+    var userDataAux = User.get(requestData.idUser);
+    var foundUser = switch (userDataAux) {
+      case (null) {
+        Buffer.Buffer<Text>(0);
+      };
+      case (?userDataAux) userDataAux;
+    };
+    var FoundPOAPMetadata = POAP.get(foundUser.get(requestData.indexList));
     var auxPoap = switch (FoundPOAPMetadata) {
       case (null) {
         {
@@ -231,8 +261,7 @@ actor {
     return auxPoap;
   };
 
-  
-  public func mintPoap(prop : mintPoapData): () {
+  public func mintPoap(prop : mintPoapData): async (Nat) {
     let FoundPOAPMetadata = POAP.get(prop.id);
     Debug.print("POAP check for mint");
     var auxPoap = switch (FoundPOAPMetadata) {
@@ -314,9 +343,7 @@ actor {
       code = auxPoap.code;
     };
     ignore POAP.replace(prop.id, updatePoap);
+    return data;
   };
 
-
-
-  
 };
