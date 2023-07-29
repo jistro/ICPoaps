@@ -12,57 +12,41 @@ import Array "mo:base/Array";
 actor {
   stable var counter = 1;
   type idPoap = Text;
-  type titlePoap = Text;
-  type imagePoap = Text;
-  type descriptionPoap = Text;
-  type isCertificationPoap = Bool;
-  type isOnlinePoap = Bool;
-  type eventUrlPoap = Text;
-  type eventCityPoap = Text;
-  type eventCountryPoap = Text;
-  type eventDatePoap = Text;
-  type poapMintLimit = Nat;
-  type poapMinted = Nat;
-  type userAddress = Text;
-  type codePoap = Text;
-  type userId = Text;
-  type listPoap = List.List<idPoap>;
-  type listUserPoapsMetadata = Buffer.Buffer<Text>;
 
   type boolAnswer = Bool;
 
   type POAPmetadata = {
-    title : titlePoap;
-    image : imagePoap;
-    description : descriptionPoap;
-    isCertification : isCertificationPoap;
-    isOnline : isOnlinePoap;
-    eventUrl : eventUrlPoap;
-    eventCity : eventCityPoap;
-    eventCountry : eventCountryPoap;
-    eventDate : eventDatePoap;
-    mintLimit : poapMintLimit;
-    minted : poapMinted;
-    code : codePoap;
+    title : Text;
+    image : Text;
+    description : Text;
+    isCertification : Bool;
+    isOnline : Bool;
+    eventUrl : Text;
+    eventCity : Text;
+    eventCountry : Text;
+    eventDate : Text;
+    mintLimit : Nat;
+    minted : Nat;
+    code : Text;
   };
 
   type metadataNewPOAP = {
-    title : titlePoap;
-    image : imagePoap;
-    description : descriptionPoap;
-    isCertification : isCertificationPoap;
-    isOnline : isOnlinePoap;
-    eventUrl : eventUrlPoap;
-    eventCity : eventCityPoap;
-    eventCountry : eventCountryPoap;
-    eventDate : eventDatePoap;
-    mintLimit : poapMintLimit;
-    code : codePoap;
+    title : Text;
+    image : Text;
+    description : Text;
+    isCertification : Bool;
+    isOnline : Bool;
+    eventUrl : Text;
+    eventCity : Text;
+    eventCountry : Text;
+    eventDate : Text;
+    mintLimit : Nat;
+    code : Text;
   };
 
 
   type mintPoapData = {
-    id : Text; user : userAddress; code : Text;
+    id : Text; user : Text; code : Text;
   };
 
 
@@ -72,18 +56,18 @@ actor {
   };
 
   type userPoapsMintedMetadata ={
-    title : titlePoap;
-    image : imagePoap;
-    description : descriptionPoap;
-    isCertification : isCertificationPoap;
-    isOnline : isOnlinePoap;
-    eventUrl : eventUrlPoap;
-    eventCity : eventCityPoap;
-    eventCountry : eventCountryPoap;
-    eventDate : eventDatePoap;
-    mintLimit : poapMintLimit;
-    minted : poapMinted;
-    code : codePoap;
+    title : Text;
+    image : Text;
+    description : Text;
+    isCertification : Bool;
+    isOnline : Bool;
+    eventUrl : Text;
+    eventCity : Text;
+    eventCountry : Text;
+    eventDate : Text;
+    mintLimit : Nat;
+    minted : Nat;
+    code : Text;
   };
   
 
@@ -219,7 +203,7 @@ actor {
   /// -si es certificacion o no
   /// -cantidad de poaps que se pueden mintear
   /// -cantidad de poaps que se mintearon
-  public query func getSizeListOfPoapMintedByUser(userID : userId): async Nat{
+  public query func getSizeListOfPoapMintedByUser(userID : Text): async Nat{
     var userDataAux = User.get(userID);
     var foundUser = switch (userDataAux) {
       case (null) {
