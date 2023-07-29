@@ -7,6 +7,7 @@ import Error "mo:base/Error";
 import List "mo:base/List";
 import Buffer "mo:base/Buffer";
 import RBTree "mo:base/RBTree";
+import Array "mo:base/Array";
 
 actor {
   stable var counter = 1;
@@ -26,7 +27,7 @@ actor {
   type codePoap = Text;
   type userId = Text;
   type listPoap = List.List<idPoap>;
-
+  type listUserPoapsMetadata = Buffer.Buffer<Text>;
 
   type boolAnswer = Bool;
 
@@ -192,9 +193,43 @@ actor {
     POAP.get(id);
   };
 
-  /*public query func getUser(id : Text): async  ?Buffer.Buffer<Text>{
-    User.get(id);
-  };*/
+  ///@note nesecita agarrar cada id almacenado en el buffer del ususario, buscarlo y depues alamacenar unica y exclusivamente
+  /// -nombre del poap
+  /// -imagen del poap
+  /// -descripcion del poap
+  /// -si es certificacion o no
+  /// -cantidad de poaps que se pueden mintear
+  /// -cantidad de poaps que se mintearon
+  public query func getUser(id : Text): async POAPmetadata{
+    var userDataAux = User.get(id);
+    var foundUser = switch (userDataAux) {
+      case (null) {
+        Buffer.Buffer<Text>(0);
+      };
+      case (?userDataAux) userDataAux;
+    };
+    var FoundPOAPMetadata = POAP.get(foundUser.get(0));
+    var auxPoap = switch (FoundPOAPMetadata) {
+      case (null) {
+        {
+          title = "POAP not found";
+          image = "";
+          description = "";
+          isCertification = false;
+          isOnline = false;
+          eventUrl = "";
+          eventCity = "";
+          eventCountry = "";
+          eventDate = "";
+          mintLimit = 0;
+          minted = 0;
+          code = "";
+        };
+      };
+      case (?FoundPOAPMetadata) FoundPOAPMetadata;
+    };
+    return auxPoap;
+  };
 
   
   public func mintPoap(prop : mintPoapData): () {
