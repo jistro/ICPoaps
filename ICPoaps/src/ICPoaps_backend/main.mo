@@ -3,18 +3,15 @@ import Text "mo:base/Text";
 import Nat "mo:base/Nat";
 import Bool "mo:base/Bool";
 import Debug "mo:base/Debug";
-import Error "mo:base/Error";
-import List "mo:base/List";
 import Buffer "mo:base/Buffer";
 import RBTree "mo:base/RBTree";
-import Array "mo:base/Array";
 
 actor {
+  // contador de id de poaps
   stable var counter = 1;
+
   type idPoap = Text;
-
   type boolAnswer = Bool;
-
   type POAPmetadata = {
     title : Text;
     image : Text;
@@ -29,7 +26,6 @@ actor {
     minted : Nat;
     code : Text;
   };
-
   type metadataNewPOAP = {
     title : Text;
     image : Text;
@@ -43,18 +39,6 @@ actor {
     mintLimit : Nat;
     code : Text;
   };
-
-
-  type mintPoapData = {
-    id : Text; user : Text; code : Text;
-  };
-
-
-  type getUserPoapListData = {
-    idUser : Text;
-    indexList : Nat;
-  };
-
   type userPoapsMintedMetadata ={
     title : Text;
     image : Text;
@@ -70,13 +54,42 @@ actor {
     code : Text;
   };
   
+  type mintPoapData = {
+    id : Text; user : Text; code : Text;
+  };
+  type UserPoapListData = {
+    idUser : Text;
+    indexList : Nat;
+  };
+  type metadataPOAPForUser = {
+    title : Text;
+    image : Text;
+    description : Text;
+    isCertification : Bool;
+    isOnline : Bool;
+    eventUrl : Text;
+    eventCity : Text;
+    eventCountry : Text;
+    eventDate : Text;
+    mintLimit : Nat;
+    minted : Nat;
+  };
 
-
+  //tabla de hash que contiene los poaps junto con su metadata
   let POAP = Map.HashMap<idPoap, POAPmetadata>(0, Text.equal, Text.hash);
+  //tabla de arbol que contiene los usuarios junto con los poaps que mintearon
   let User = RBTree.RBTree<Text, Buffer.Buffer<Text> >(Text.compare);
 
-  /// funcion que genera un nuevo poap y lo guarda en la tabla
+  /// funcion que genera un nuevo poap y devuelve el id del poap
   public func newPoap(metadata : metadataNewPOAP): async (Nat) {
+    /*
+    * Hace los chequeos de que los campos obligatorios esten completos
+    * los cuales son:
+    * - mintLimit
+    * - title
+    * - image
+    * - description
+    */
       if  (metadata.mintLimit <= 0) {
         Debug.trap("You must enter a mint limit");
       };
@@ -91,9 +104,10 @@ actor {
       };
     
       /* 
-      * verifica si el poap es online o no, de ser online
-      * no se guarda la ciudad y el pais y de no serlo 
-      * se guarda la ciudad y el pais
+      * separa los casos de certificaciones y eventos/meetups...
+      * si isCertification es true, es una certificacion
+      * si isOnline es true, es un evento online
+      * si isOnline es false, es un evento presencial y en ese caso se debe especificar la ciudad y el pais
       */
       if (metadata.isCertification){
         if (metadata.isOnline) {
@@ -118,6 +132,7 @@ actor {
           Debug.print("POAP online created");
           Debug.print(Nat.toText counter);
         } else {
+          
           if (metadata.eventCity == "") {
             Debug.trap("You irl POAP must have a city");
           };
@@ -192,29 +207,86 @@ actor {
       return counter - 1;
   };
 
-  public query func getPoap(id : Text): async ?POAPmetadata{
+  /* 
+  * funcion que devuelve la metadata de un poap completa
+  * si el poap no existe devuelve null
+  *
+  * ATENCION: esta funcion devuelve la metadata completa de un poap,
+  * eso incluye el codigo de la certificacion, por lo que no se debe
+  * usar para mostrar la metadata de un poap a un usuario si se desea 
+  * mostrar la metadata de un poap minteado por un usuario usar la funcion
+  * getPoapMintedByUserFromTheList o si se desea mostrar la metadata de un
+  * poap sin usuario usar la funcion getPoapInfo
+  */
+  public query func getPoapInfoForDev(id : Text): async ?POAPmetadata{
     POAP.get(id);
   };
 
-   ///@note nesecita agarrar cada id almacenado en el buffer del ususario, buscarlo y depues alamacenar unica y exclusivamente
-  /// -nombre del poap
-  /// -imagen del poap
-  /// -descripcion del poap
-  /// -si es certificacion o no
-  /// -cantidad de poaps que se pueden mintear
-  /// -cantidad de poaps que se mintearon
+  /*
+  * funcion que devuelve la metadata de un poap sin el codigo
+  * si el poap no existe se devuelve un error
+  */
+  public query func getPoapInfo(id : Text): async metadataPOAPForUser{
+    let FoundPOAPMetadata = POAP.get(id);
+    var auxPoap = switch (FoundPOAPMetadata) {
+      case (null) {
+        {
+          title = "POAP not found";
+          image = "";
+          description = "";
+          isCertification = false;
+          isOnline = false;
+          eventUrl = "";
+          eventCity = "";
+          eventCountry = "";
+          eventDate = "";
+          mintLimit = 0;
+          minted = 0;
+          code = "";
+        };
+      };
+      case (?FoundPOAPMetadata) FoundPOAPMetadata;
+    };
+
+    if (auxPoap.mintLimit == 0){
+      Debug.trap("Error 404: POAP not found");
+    };
+
+    return  {
+      title = auxPoap.title;
+      image = auxPoap.image;
+      description = auxPoap.description;
+      isCertification = auxPoap.isCertification;
+      isOnline = auxPoap.isOnline;
+      eventUrl = auxPoap.eventUrl;
+      eventCity = auxPoap.eventCity;
+      eventCountry = auxPoap.eventCountry;
+      eventDate = auxPoap.eventDate;
+      mintLimit = auxPoap.mintLimit;
+      minted = auxPoap.minted;
+    };
+  };
+
+  /*
+  * funcion que devuelve la cantidad de poaps minteados por un usuario
+  * si el usuario no ha minteado devuelve 0
+  */
+
   public query func getSizeListOfPoapMintedByUser(userID : Text): async Nat{
     var userDataAux = User.get(userID);
     var foundUser = switch (userDataAux) {
-      case (null) {
-        Buffer.Buffer<Text>(0);
-      };
+      case (null) { Buffer.Buffer<Text>(0);};
       case (?userDataAux) userDataAux;
     };
     return foundUser.size();
   };
 
-  public query func getPoapMintedByUserFromTheList(requestData : getUserPoapListData): async POAPmetadata{
+  /*
+  * funcion que devuelve la metadata de un poap minteado por un usuario por lista del mas antiguo al mas nuevo
+  * si el usuario no ha minteado devuelve null
+  */
+
+  public query func getPoapMintedByUserFromTheList(requestData : UserPoapListData): async metadataPOAPForUser{
     var userDataAux = User.get(requestData.idUser);
     var foundUser = switch (userDataAux) {
       case (null) {
@@ -242,9 +314,24 @@ actor {
       };
       case (?FoundPOAPMetadata) FoundPOAPMetadata;
     };
-    return auxPoap;
+    return  {
+      title = auxPoap.title;
+      image = auxPoap.image;
+      description = auxPoap.description;
+      isCertification = auxPoap.isCertification;
+      isOnline = auxPoap.isOnline;
+      eventUrl = auxPoap.eventUrl;
+      eventCity = auxPoap.eventCity;
+      eventCountry = auxPoap.eventCountry;
+      eventDate = auxPoap.eventDate;
+      mintLimit = auxPoap.mintLimit;
+      minted = auxPoap.minted;
+    };
   };
 
+  /*
+  * funcion que permite el mint de un poap por un usuario
+  */
   public func mintPoap(prop : mintPoapData): async (Nat) {
     let FoundPOAPMetadata = POAP.get(prop.id);
     Debug.print("POAP check for mint");
@@ -284,9 +371,7 @@ actor {
       };
     };
 
-    
     Debug.print("Check user");
-
     var userDataAux = User.get(prop.user);
     var foundUser = switch (userDataAux) {
       case (null) {
@@ -299,19 +384,16 @@ actor {
       foundUser.add(prop.id);
     } else {
       Debug.print("Old user");
-
       if (Buffer.contains<Text>(foundUser, prop.id, Text.equal)){
         Debug.trap("User already has this POAP");
       };
       foundUser.add(prop.id);
-
     };
     ignore User.replace(prop.user, foundUser);
-    Debug.print("Add poap to user");
 
+    Debug.print("Add poap to user");
     var data = auxPoap.minted + 1; 
     Debug.print(Nat.toText data);
-
     var updatePoap = {
       title = auxPoap.title;
       image = auxPoap.image;
