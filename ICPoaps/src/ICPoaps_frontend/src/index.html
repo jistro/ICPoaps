@@ -1,24 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>ICPoaps</title>
-    <base href="/" />
-    <link rel="icon" href="favicon.ico" />
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,300;0,600;1,500&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="main.css" />
-  </head>
-  <body>
-    <main>
-      <img src="logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#">
-        <label for="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting"></section>
-    </main>
-  </body>
+    <link rel="icon" href="favicon.ico" />
+    <base href="/" />
+    <title>ICPoap</title>
+</head>
+<body>
+    <h1>ICPoap</h1>
+    <form action="#" method="POST">
+        <label for="title">Título:</label>
+        <input type="text" id="title" name="title" required>
+        <br>
+
+        <label for="image">URL de la Imagen:</label>
+        <input type="text" id="image" name="image" required>
+        <br>
+
+        <label for="description">Descripción:</label>
+        <textarea id="description" name="description" rows="4" required></textarea>
+        <br>
+
+        <label for="tipoEvento">Tipo de Evento:</label>
+        <select id="tipoEvento" name="tipoEvento" required>
+            <option value="virtual">Virtual</option>
+            <option value="presencial">Presencial</option>
+        </select>
+        <br>
+
+        <label for="tipoCertificado">Tipo de Certificado:</label>
+        <select id="tipoCertificado" name="tipoCertificado" required>
+            <option value="certificado">Certificado</option>
+            <option value="poap">POAP</option>
+        </select>
+        <br>
+
+        <label for="eventUrl">URL del Evento:</label>
+        <input type="text" id="eventUrl" name="eventUrl" required>
+        <br>
+
+        <label for="eventCity">Ciudad del Evento:</label>
+        <input type="text" id="eventCity" name="eventCity" required>
+        <br>
+
+        <label for="eventCountry">País del Evento:</label>
+        <input type="text" id="eventCountry" name="eventCountry" required>
+        <br>
+
+        <label for="eventDate">Fecha del Evento:</label>
+        <input type="text" id="eventDate" name="eventDate" required>
+        <br>
+
+        <label for="mintLimit">Límite de Emisiones:</label>
+        <input type="number" id="mintLimit" name="mintLimit" required>
+        <br>
+
+        <label for="code">Código del Evento:</label>
+        <input type="text" id="code" name="code" required>
+        <br>
+
+        <input type="submit" value="Enviar" class="boton-enviar">
+    </form>
+    <img src="logo2.svg" alt="DFINITY logo" />
+</body>
 </html>
+
