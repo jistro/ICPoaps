@@ -46,11 +46,7 @@ input[type="submit"] {
     cursor: pointer;
 }
 
-input[type="submit"]:hover {
-    background-color: #320744;
-}
-
-.boton-pagina {
+.btn--confrimSend {
     display: inline-block;
     padding: 10px 20px;
     background-color: #CF99FF;
@@ -59,32 +55,30 @@ input[type="submit"]:hover {
     border-radius: 5px;
 }
 
-.boton-pagina:hover {
-    background-color: #320744;
+.btn--confrimSend:hover {
+    background-color: #c17bff;
 }
 
-.botones-container {
-    display: flex; /* Utilizar flexbox para el diseño */
-    justify-content: space-between; /* Distribuir los botones a lo largo del contenedor */
+
+.container--twoSideByside {
+    display: flex;
+    justify-content: space-between;
 }
 
-.boton-makePoap,
-.boton-mintPoap {
-    flex: 1; /* Hace que los botones ocupen el espacio disponible de manera dinámica */
-    height: 200px;
-    padding: 10px 20px;
-    background-color: #CF99FF;
-    color: #fff;
-    text-decoration: none;
+.container--formNewPoap,
+.container--formMintPoap {
+    /*display: flex;*/
+    flex: 1;
+    max-width: auto; /* Puedes ajustar el valor máximo según tus necesidades */
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid #ccc;
     border-radius: 5px;
-    display: inline-flex; /* Para que los botones se muestren en línea */
-    justify-content: center; /* Centrar el contenido horizontalmente */
-    align-items: center; /* Centrar el contenido verticalmente */
-    font-size: 5vw; /* Ajustar tamaño del texto en función del ancho del botón */
-    font-weight: bold; /* Hacer el texto en negrita */
 }
 
-.boton-makePoap:hover,
-.boton-mintPoap:hover {
-    background-color: #320744;
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+    .container--twoSideByside {
+        display: block;
+    }
 }
