@@ -12,7 +12,7 @@ class ICPoaps extends React.Component {
   async makeNewPoap() {
     let title = document.getElementById("newPoap_title")?.value;
     let image = document.getElementById("newPoap_image")?.value;
-    let description = document.getElementById("newPoap_description")?.value;
+    let description = document.querySelector("textarea[name=newPoap_description]")?.value;
     let tipoCertificado = document.getElementById("newPoap_tipoCertificado")?.value;
     let tipoEvento = document.getElementById("newPoap_tipoEvento")?.value;
     let eventUrl = document.getElementById("newPoap_eventUrl")?.value;
@@ -22,8 +22,8 @@ class ICPoaps extends React.Component {
     let mintLimit = document.getElementById("newPoap_mintLimit")?.value;
     let code = document.getElementById("newPoap_code")?.value;
 
-    let isOnline= tipoEvento === "Virtual" ? true : false;
-    let isCertification= tipoCertificado === "Certificado" ? true : false;
+    let isOnline= tipoEvento === "virtual" ? true : false;
+    let isCertification= tipoCertificado === "certificado" ? true : false;
 
     if (mintLimit && !isNaN(mintLimit) && parseInt(mintLimit) >= 0) {
       mintLimit = parseInt(mintLimit);
@@ -32,27 +32,34 @@ class ICPoaps extends React.Component {
     }
     
     console.log("accss");
-    //console.log(title, image, description, tipoCertificado, tipoEvento, eventUrl, eventCity, eventCountry, eventDate, mintLimit, code, isVirtual, isCertification);
-    //{title:text; code:text; isOnline:bool; description:text; isCertification:bool; mintLimit:nat; eventCountry:text; image:text; eventUrl:text; eventCity:text; eventDate:text}
-    canister.newPoap(
+    console.log(
+      title,
       code, 
-      description, 
-      eventCity, 
-      eventCountry, 
-      eventDate, 
-      eventUrl, 
-      image, 
-      isCertification, 
-      isOnline, 
-      mintLimit, 
-      title
+      isOnline,
+      description,
+      isCertification,
+      mintLimit,
+      eventCountry,
+      image,
+      eventUrl,
+      eventCity,
+      eventDate
     );
-  }
-  async doInsert() {
-    let name = document.getElementById("newEntryName")?.value;
-    let desc = document.getElementById("newEntryDesc")?.value;
-    let phone = document.getElementById("newEntryPhone")?.value;
-    canister.newPoap(name, { desc, phone });
+    canister.newPoap({
+      title,
+      code, 
+      isOnline,
+      description,
+      isCertification,
+      mintLimit,
+      eventCountry,
+      image,
+      eventUrl,
+      eventCity,
+      eventDate
+    }).then((result) => {
+      console.log(result);
+    });
   }
 
   render() {
