@@ -1,10 +1,18 @@
 
 body {
     font-family: 'Poppins', sans-serif;
+    margin: 0;
 }
 
 h1 {
-    color: #333;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    font-weight: 300;
 }
 
 form {
@@ -20,6 +28,36 @@ label {
     margin-bottom: 5px;
 }
 
+nav {
+    background: #CF99FF;
+    font-size: 1.5rem;
+    padding: 5px 20px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.container--twoSideByside {
+    display: flex;
+    justify-content: space-between;
+}
+
+.container--findPoapData,
+.container--formNewPoap,
+.container--formMintPoap {
+    /*display: flex;*/
+    flex: 1;
+    max-width: auto; /* Puedes ajustar el valor máximo según tus necesidades */
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid #d9c2db;
+    border-radius: 6px;
+}
+
 input[type="text"],
 input[type="email"],
 textarea,
@@ -32,7 +70,16 @@ select {
     box-sizing: border-box;
 }
 
-input[type="number"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+
 input[type="checkbox"] {
     margin-right: 5px;
 }
@@ -46,6 +93,16 @@ input[type="submit"] {
     cursor: pointer;
 }
 
+input[type="url"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.btn--mint,
 .btn--confrimSend {
     display: inline-block;
     padding: 10px 20px;
@@ -54,25 +111,18 @@ input[type="submit"] {
     text-decoration: none;
     border-radius: 5px;
 }
-
+.btn--mint:hover,
 .btn--confrimSend:hover {
     background-color: #c17bff;
 }
 
-
-.container--twoSideByside {
-    display: flex;
-    justify-content: space-between;
-}
-
-.container--formNewPoap,
-.container--formMintPoap {
-    /*display: flex;*/
-    flex: 1;
-    max-width: auto; /* Puedes ajustar el valor máximo según tus necesidades */
-    margin: 10px;
-    padding: 20px;
-    border: 1px solid #ccc;
+.btn-access-internetId {
+    width: 100%;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #CF99FF;
+    color: #fff;
+    text-decoration: none;
     border-radius: 5px;
 }
 
