@@ -21,10 +21,11 @@ class ICPoaps extends React.Component {
         eventCity: "",
         eventDate: "",
       },
+      poapsMintedByUser: 0,
     };
   }
 
-  
+
 
   async makeNewPoap() {
     let title = document.getElementById("newPoap_title")?.value;
@@ -125,6 +126,25 @@ class ICPoaps extends React.Component {
       console.log(this.state.metadataPoapFinded);
     });
   }
+
+  async findPoapsMintedByUserID() {
+    let wallet = document.getElementById("findPoapsMintedByUserID_wallet").value;
+    console.log(wallet);
+    canister.getSizeListOfPoapMintedByUser(wallet).then((result) => {
+      console.log(result);
+      const poapsMintedByUser = parseInt(result);
+      this.setState({ poapsMintedByUser });
+    });
+    if (this.state.poapsMintedByUser === 0){
+      return;
+    }
+    let i = 0;
+    for (i = 0; i < this.state.poapsMintedByUser; i++){
+      canister.getPoapMintedByUserFromTheList({idUser: wallet, indexList: i}).then((result) => {
+        console.log(result);
+      });
+    }
+  }
   
 
 
@@ -221,32 +241,38 @@ class ICPoaps extends React.Component {
             </div>
           </div>
         </div>
-        <div className="container--findPoapData" >
-          <h2 className="titleTextCenterContainer">Ver datos de Poap</h2>
-          <label >ID de poap:</label>
-          <input type="text" id="findPoapData_id"/>
-          <button onClick={() => this.findPoapDataById()} className="btn--findPoapData">Ver datos</button>
-          <div className="container--poapData">
-          {this.state.metadataPoapFinded.title !== "" && (<h2>Título: {this.state.metadataPoapFinded.title}</h2>)}
-          {this.state.metadataPoapFinded.minted !== 0 && (<h2>Minted: {this.state.metadataPoapFinded.minted}</h2>)}
-          {this.state.metadataPoapFinded.isOnline !== false && (<h2>Es un evento online</h2>)}
-          {this.state.metadataPoapFinded.description !== "" && (<h2>Descripción: {this.state.metadataPoapFinded.description}</h2>)}
-          {this.state.metadataPoapFinded.isCertification !== false && (<h2>Es un certificado</h2>)}
-          {this.state.metadataPoapFinded.mintLimit !== 0 && (<h2>Límite de Emisiones: {this.state.metadataPoapFinded.mintLimit}</h2>)}
-          {this.state.metadataPoapFinded.eventCountry !== "" && (<h2>País del Evento: {this.state.metadataPoapFinded.eventCountry}</h2>)}
-          {this.state.metadataPoapFinded.image !== "" && (<h2>Imagen: {this.state.metadataPoapFinded.image}</h2>)}
-          {this.state.metadataPoapFinded.eventUrl !== "" && (<h2>URL del Evento: {this.state.metadataPoapFinded.eventUrl}</h2>)}
-          {this.state.metadataPoapFinded.eventCity !== "" && (<h2>Ciudad del Evento: {this.state.metadataPoapFinded.eventCity}</h2>)}
-          {this.state.metadataPoapFinded.eventDate !== "" && (<h2>Fecha del Evento: {this.state.metadataPoapFinded.eventDate}</h2>)}
+        <div className="container--twoSideByside">
+          <div className="container--findPoapData" >
+            <h2 className="titleTextCenterContainer">Ver datos de Poap</h2>
+            <label >ID de poap:</label>
+            <input type="text" id="findPoapData_id"/>
+            <button onClick={() => this.findPoapDataById()} className="btn--findPoapData">Ver datos</button>
+            <br />
+            {this.state.metadataPoapFinded.title !== "" && (<h1>{this.state.metadataPoapFinded.title}</h1>)}
+            {this.state.metadataPoapFinded.isOnline !== false && (<p>Evento online</p>)}
+            {this.state.metadataPoapFinded.isCertification !== false && (<p>Es un certificado</p>)}
+            {this.state.metadataPoapFinded.minted !== 0 && (<p>Reclamados: {parseInt(this.state.metadataPoapFinded.minted)}</p>)}
+            {this.state.metadataPoapFinded.description !== "" && (<p>Descripción: {this.state.metadataPoapFinded.description}</p>)}
+            {this.state.metadataPoapFinded.mintLimit !== 0 && (<p>Límite de Emisiones: {parseInt(this.state.metadataPoapFinded.mintLimit)}</p>)}
+            {this.state.metadataPoapFinded.eventCountry !== "" && (<p>País del Evento: {this.state.metadataPoapFinded.eventCountry}</p>)}
+            {this.state.metadataPoapFinded.image !== "" && (<p>Imagen: {this.state.metadataPoapFinded.image}</p>)}
+            {this.state.metadataPoapFinded.eventUrl !== "" && (<p>URL del Evento: {this.state.metadataPoapFinded.eventUrl}</p>)}
+            {this.state.metadataPoapFinded.eventCity !== "" && (<p>Ciudad del Evento: {this.state.metadataPoapFinded.eventCity}</p>)}
+            {this.state.metadataPoapFinded.eventDate !== "" && (<p>Fecha del Evento: {this.state.metadataPoapFinded.eventDate}</p>)}
           </div>
-          <br />
+          <div className="container--findPoapsMintedByUserID" >
+            <h2 className="titleTextCenterContainer">Ver tus poaps</h2>
+            <label >Dirección de la billetera/internetID:</label>
+            <input type="text" id="findPoapsMintedByUserID_wallet"/>
+            <button onClick={() => this.findPoapsMintedByUserID()} className="btn--findPoapsMintedByUserID">Ver poaps</button>
+            <br />
+          </div>
         </div>
 
         <br className="Bigbr"/>
         <footer className="footer">
           <p className="footer--textCR">ICPoaps © 2023</p>
-          <p className="footer--textWLove">Made by jistro with ❤️
-          </p>
+          <p className="footer--textWLove">Made by jistro with ❤️</p>
           <div className="imgContainer">
             <img src="motoko.png" alt="Motoko logo" className="motokoImg"/> 
             <img src="hostedOnChain.png" alt="DFINITY logo" className="onChainImg"/> 

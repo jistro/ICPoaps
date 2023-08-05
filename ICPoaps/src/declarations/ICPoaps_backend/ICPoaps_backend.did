@@ -1,0 +1,63 @@
+type mintPoapData = 
+ record {
+   code: text;
+   id: text;
+   user: text;
+ };
+type metadataPOAPForUser = 
+ record {
+   description: text;
+   eventCity: text;
+   eventCountry: text;
+   eventDate: text;
+   eventUrl: text;
+   image: text;
+   isCertification: bool;
+   isOnline: bool;
+   mintLimit: nat;
+   minted: nat;
+   title: text;
+ };
+type metadataNewPOAP = 
+ record {
+   code: text;
+   description: text;
+   eventCity: text;
+   eventCountry: text;
+   eventDate: text;
+   eventUrl: text;
+   image: text;
+   isCertification: bool;
+   isOnline: bool;
+   mintLimit: nat;
+   title: text;
+ };
+type UserPoapListData = 
+ record {
+   idUser: text;
+   indexList: nat;
+ };
+type POAPmetadata = 
+ record {
+   code: text;
+   description: text;
+   eventCity: text;
+   eventCountry: text;
+   eventDate: text;
+   eventUrl: text;
+   image: text;
+   isCertification: bool;
+   isOnline: bool;
+   mintLimit: nat;
+   minted: nat;
+   title: text;
+ };
+service : {
+  getPoapInfo: (text) -> (metadataPOAPForUser) query;
+  getPoapInfoForDev: (text) -> (opt POAPmetadata) query;
+  getPoapMintedByUserFromTheList: (UserPoapListData) ->
+   (metadataPOAPForUser) query;
+  getSizeListOfPoapMintedByUser: (text) -> (nat) query;
+  mintPoap: (mintPoapData) -> (nat);
+  newPoap: (metadataNewPOAP) -> (nat);
+}

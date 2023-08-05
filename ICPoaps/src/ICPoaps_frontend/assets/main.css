@@ -1,145 +1,248 @@
 /* Estilos globales */
 body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  background-color: #f8f8f8;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: 300;
+  color: #333;
+}
+
+.titleTextCenterContainer {
+  text-align: center;
+  padding: 0%;
+}
+
+/* Estilos para la barra de navegación */
+nav {
+  background: #CF99FF;
+  font-size: 1.8rem;
+  padding: 1rem 2rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logoICPoaps {
+  width: 60px;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.textIcpoaps {
+  font-size: 2rem;
+  color: #fff;
+  font-weight: 300;
+  margin: 0;
+  padding: 10px;
+}
+
+/* Estilos para el contenedor principal */
+.clearfix {
+  clear: both;
+}
+
+.container--twoSideByside {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Estilos para el formulario de "Make POAP" */
+.container--formNewPoap,
+.container--formMintPoap,
+.container--findPoapData,
+.container--findPoapsMintedByUserID {
+  flex: 1;
+  max-width: 600px;
+  margin: 10px;
+  padding: 1rem;
+  border: 1px solid #d9c2db;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"],
+input[type="email"],
+textarea,
+select,
+input[type="number"],
+input[type="url"] {
+  width: 100%;
+  padding: .5rem;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+input[type="submit"],
+.btn--mint,
+.btn--confrimSend,
+.btn--findPoapData,
+.btn--findPoapsMintedByUserID {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background-color: #CF99FF;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.container--poapData {
+  flex: 1;
+  max-width: 600px;
+  margin: 10px;
+  padding: 1rem;
+  border: 1px solid #d9c2db;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-access-internetId {
+  width: 100%;
+  display: inline-block;
+  padding: 1rem 2rem;
+  background-color: #CF99FF;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover,
+.btn--mint:hover,
+.btn--confrimSend:hover,
+.btn-access-internetId:hover,
+.btn--findPoapData:hover,
+.btn--findPoapsMintedByUserID:hover {
+  background-color: #c17bff;
+}
+
+/* Estilos para el footer */
+footer {
+  background: #CF99FF;
+  font-size: 1.8rem;
+  padding: 1rem 2rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footer--textCR {
+  font-size: 1.4rem;
+  font-weight: 300;
+  margin: 0;
+  padding: 10px;
+}
+
+.footer--textWLove {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0;
+  padding: 10px;
+}
+
+.imgContainer {
+  display: flex;
+  align-items: center;
+}
+
+.onChainImg {
+  width: 50px;
+  height: auto;
+  margin: 0;
+  padding: 0px;
+}
+
+.motokoImg {
+  width: 80px;
+  height: auto;
+  margin: 0;
+  padding: 0px;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+  .container--twoSideByside {
+    display: block;
   }
-  
+
   h1 {
     font-size: 2rem;
-    margin-bottom: 20px;
   }
-  
+
   h2 {
     font-size: 1.5rem;
-    margin-bottom: 20px;
-    font-weight: 300;
   }
-  
+
   .titleTextCenterContainer {
-    text-align: center;
-    padding: 0%;
+    padding: 2%;
   }
-  
-  /* Estilos para la barra de navegación */
-  nav {
-    background: #CF99FF;
-    font-size: 1.5rem;
-    padding: 5px 20px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    margin: 0;
-    box-sizing: border-box;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  }
-  
+
   .logoICPoaps {
-    width: 70px;
+    width: 50px;
     height: auto;
     margin: 0;
     padding: 0;
   }
   
   .textIcpoaps {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
+    color: #fff;
     font-weight: 300;
     margin: 0;
     padding: 10px;
   }
-  
-  /* Estilos para el contenedor principal */
-  .clearfix {
-    clear: both;
-  }
-  
-  .container--twoSideByside {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  /* Estilos para el formulario de "Make POAP" */
+
   .container--formNewPoap,
   .container--formMintPoap,
   .container--findPoapData {
-    flex: 1;
-    max-width: auto;
-    margin: 10px;
-    padding: 20px;
-    border: 1px solid #d9c2db;
-    border-radius: 6px;
+    padding: 1rem;
   }
-  
-  input[type="text"],
-  input[type="email"],
-  textarea,
-  select,
-  input[type="number"],
-  input[type="url"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-  
-  input[type="checkbox"] {
-    margin-right: 5px;
-  }
-  
+
   input[type="submit"],
   .btn--mint,
   .btn--confrimSend,
+  .btn-access-internetId,
   .btn--findPoapData {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #CF99FF;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 1rem;
   }
-  
-  .btn-access-internetId {
-    width: 100%;
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #CF99FF;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-}
 
-  input[type="submit"]:hover,
-  .btn--mint:hover,
-  .btn--confrimSend:hover,
-  .btn-access-internetId:hover,
-  .btn--findPoapData:hover {
-    background-color: #c17bff;
-  }
-  
-  /* Estilos para el footer */
-  footer {
-    background: #CF99FF;
-    font-size: 1.5rem;
-    padding: 5px 20px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    margin: 0;
-    box-sizing: border-box;
-    justify-content: space-between;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  }
-   
-  .footer--textCR{
-    font-size: 1.2rem;
+  .footer--textCR {
+    font-size: .7rem;
     font-weight: 300;
     margin: 0;
     padding: 10px;
   }
-  .footer--textWLove{
-    font-size: 0.8rem;
+  
+  .footer--textWLove {
+    font-size: .5rem;
     font-weight: 800;
     margin: 0;
     padding: 10px;
@@ -151,27 +254,16 @@ body {
   }
   
   .onChainImg {
-    width: 60px;
+    width: 50px;
     height: auto;
     margin: 0;
     padding: 0px;
   }
   
   .motokoImg {
-    width: 100px;
+    width: 50px;
     height: auto;
     margin: 0;
     padding: 0px;
   }
-  
-  /* Estilos para dispositivos móviles */
-  @media (max-width: 768px) {
-    .container--twoSideByside {
-      display: block;
-    }
-  }
-  
-  .Bigbr {
-    padding-top: 20px;
-    padding-bottom: 20px;
-  }
+}
