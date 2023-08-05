@@ -22,6 +22,7 @@ class ICPoaps extends React.Component {
         eventDate: "",
       },
       poapsMintedByUser: 0,
+      poapsDataList: [],
     };
   }
 
@@ -103,11 +104,14 @@ class ICPoaps extends React.Component {
   async findPoapDataById() {
     let id = document.getElementById("findPoapData_id").value;
     console.log(id);
-    canister.getPoapInfo(id).then((opt_metadataPOAPForUser) => {
+  
+    try {
+      const opt_metadataPOAPForUser = await canister.getPoapInfo(id);
       console.log(opt_metadataPOAPForUser);
       // ...otros console.log para las otras variables
       console.log("saved in state");
       console.log(opt_metadataPOAPForUser.title);
+  
       this.setState({
         metadataPoapFinded: {
           title: opt_metadataPOAPForUser.title,
@@ -124,26 +128,46 @@ class ICPoaps extends React.Component {
         },
       });
       console.log(this.state.metadataPoapFinded);
-    });
+    } catch (error) {
+  
+      console.log(error);
+      this.setState({ metadataPoapFinded: {
+        title: "",
+        minted: 0,
+        isOnline: false,
+        description: "",
+        isCertification: false,
+        mintLimit: 0,
+        eventCountry: "",
+        image: "",
+        eventUrl: "",
+        eventCity: "",
+        eventDate: "",
+      }});
+      alert("No se encontró el poap");
+    }
   }
 
   async findPoapsMintedByUserID() {
     let wallet = document.getElementById("findPoapsMintedByUserID_wallet").value;
     console.log(wallet);
-    canister.getSizeListOfPoapMintedByUser(wallet).then((result) => {
-      console.log(result);
-      const poapsMintedByUser = parseInt(result);
-      this.setState({ poapsMintedByUser });
-    });
+    const result = await canister.getSizeListOfPoapMintedByUser(wallet);
+    console.log(result);
+
+    const poapsMintedByUser = parseInt(result);
+    const poapsDataList = [];
+  this.setState({ poapsMintedByUser });
     if (this.state.poapsMintedByUser === 0){
+      console.log("no hay poaps");
+      const poapsDataList = [];
+      this.setState({ poapsDataList });
       return;
     }
-    let i = 0;
-    for (i = 0; i < this.state.poapsMintedByUser; i++){
-      canister.getPoapMintedByUserFromTheList({idUser: wallet, indexList: i}).then((result) => {
-        console.log(result);
-      });
+    for (let i = 0; i < this.state.poapsMintedByUser; i++){
+      const poapData = await canister.getPoapMintedByUserFromTheList({ idUser: wallet, indexList: i });
+      poapsDataList.push(poapData);
     }
+    this.setState({ poapsDataList });
   }
   
 
@@ -266,6 +290,25 @@ class ICPoaps extends React.Component {
             <input type="text" id="findPoapsMintedByUserID_wallet"/>
             <button onClick={() => this.findPoapsMintedByUserID()} className="btn--findPoapsMintedByUserID">Ver poaps</button>
             <br />
+
+            <br />
+
+            {/* Lista dinámica de datos de poaps */}
+          {this.state.poapsDataList.length > 0 ? (
+            <div className="container--findPoapData">
+              {this.state.poapsDataList.map((poapData, index) => (
+                <>
+                  <p>Título: {poapData.title}</p>
+                  <p>Minted: {poapData.minted.toString()}</p>
+                  <p>Is Online: {poapData.isOnline.toString()}</p>
+                </>
+              ))}
+            </div>
+          ) : (
+            <p></p>
+          )}
+
+
           </div>
         </div>
 

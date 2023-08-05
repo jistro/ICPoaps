@@ -67,8 +67,8 @@ nav {
 .container--findPoapsMintedByUserID {
   flex: 1;
   max-width: 600px;
-  margin: 10px;
-  padding: 1rem;
+  margin: 15px;
+  padding: 4rem;
   border: 1px solid #d9c2db;
   border-radius: 10px;
   background-color: #fff;
@@ -235,14 +235,14 @@ footer {
   }
 
   .footer--textCR {
-    font-size: .7rem;
+    font-size: .8rem;
     font-weight: 300;
     margin: 0;
     padding: 10px;
   }
   
   .footer--textWLove {
-    font-size: .5rem;
+    font-size: .6rem;
     font-weight: 800;
     margin: 0;
     padding: 10px;
@@ -254,7 +254,7 @@ footer {
   }
   
   .onChainImg {
-    width: 50px;
+    width: 42px;
     height: auto;
     margin: 0;
     padding: 0px;
