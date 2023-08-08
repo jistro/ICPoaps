@@ -1,6 +1,18 @@
 import * as React from "react";
 import { render } from "react-dom";
 import { ICPoaps_backend as canister } from "../../declarations/ICPoaps_backend";
+import { Actor, ActorMethod, HttpAgent } from "@dfinity/agent";
+import { AuthClient } from "@dfinity/auth-client";
+import { Principal } from "@dfinity/principal";
+
+const webapp_id = 'bd3sg-teaaa-aaaaa-qaaba-cai'
+const webapp_idl = ({ IDL }) => {
+  return IDL.Service({
+    whoami: IDL.Func([], [IDL.Principal], ["query"]),
+    // Define other methods in the interface as well
+    // ...
+  });
+};
 
 class ICPoaps extends React.Component {
   constructor(props) {
@@ -41,7 +53,6 @@ class ICPoaps extends React.Component {
     let mintLimit = document.getElementById("newPoap_mintLimit")?.value;
     let code = document.getElementById("newPoap_code")?.value;
 
-
     if (title === "" || image === "" || description === "" || mintLimit === "") {
       alert("Por favor, complete todos los campos");
       return;
@@ -57,19 +68,13 @@ class ICPoaps extends React.Component {
     //only for test
     console.log("accss");
     console.log(
-      title,
-      code, 
-      isOnline,
-      description,
+      title, code, 
+      isOnline, description,
       isCertification,
-      mintLimit,
-      eventCountry,
-      image,
-      eventUrl,
-      eventCity,
-      eventDate
+      mintLimit, eventCountry,
+      image, eventUrl,
+      eventCity, eventDate
     );
-    
     canister.newPoap({
       title,
       code, 
@@ -89,6 +94,49 @@ class ICPoaps extends React.Component {
     });
   }
 
+
+async callInternetIdentity() {
+  
+  // First we have to create and AuthClient.
+  const authClient = await AuthClient.create();
+
+  // Call authClient.login(...) to login with Internet Identity. This will open a new tab
+  // with the login prompt. The code has to wait for the login process to complete.
+  // We can either use the callback functions directly or wrap in a promise.
+  await new Promise((resolve, reject) => {
+    authClient.login({
+      // cambia a https://identity.ic0.app para produccion 
+      identityProvider: "http://bnz7o-iuaaa-aaaaa-qaaaa-cai.localhost:4943", //"https://identity.ic0.app",
+      onSuccess: resolve,
+      onError: reject,
+    });
+  });
+  // Get the identity from the auth client:
+  console.log("authClient");
+  const identity = authClient.getIdentity();
+  console.log(identity);
+  console.log("------------------");
+  console.log("agent");
+  // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
+  const agent = new HttpAgent({ identity });
+  console.log(agent);
+  console.log("------------------");
+  console.log("webapp_idl");
+  // Using the interface description of our webapp, we create an Actor that we use to call the service methods.
+  const webapp = Actor.createActor(webapp_idl, {
+    agent,
+    canisterId: webapp_id,
+  });
+  console.log(webapp);
+  console.log("------------------");
+  console.log("whoami");
+  // Call whoami which returns the principal (user id) of the current user.
+  const principal = await webapp.whoami();
+  console.log(principal);
+  console.log("------------------");
+  document.getElementById("mintPoap_wallet").value = principal.toString();
+}
+
   async mintPoap() {
     let id = document.getElementById("mintPoap_id")?.value;
     let code = document.getElementById("mintPoap_password")?.value;
@@ -104,14 +152,14 @@ class ICPoaps extends React.Component {
   async findPoapDataById() {
     let id = document.getElementById("findPoapData_id").value;
     console.log(id);
-  
+    
     try {
       const opt_metadataPOAPForUser = await canister.getPoapInfo(id);
       console.log(opt_metadataPOAPForUser);
       // ...otros console.log para las otras variables
       console.log("saved in state");
       console.log(opt_metadataPOAPForUser.title);
-  
+
       this.setState({
         metadataPoapFinded: {
           title: opt_metadataPOAPForUser.title,
@@ -129,7 +177,6 @@ class ICPoaps extends React.Component {
       });
       console.log(this.state.metadataPoapFinded);
     } catch (error) {
-  
       console.log(error);
       this.setState({ metadataPoapFinded: {
         title: "",
@@ -169,8 +216,6 @@ class ICPoaps extends React.Component {
     }
     this.setState({ poapsDataList });
   }
-  
-
 
   render() {
     return (
@@ -179,7 +224,6 @@ class ICPoaps extends React.Component {
           <img src="logo.png" alt="" className="logoICPoaps"/>
           <h1 className="textIcpoaps">ICPoaps</h1>
         </nav>
-        
         <br />
         <div className="container--twoSideByside">
           <div className="container--formNewPoap">
@@ -187,53 +231,42 @@ class ICPoaps extends React.Component {
             <label>Título:</label>
             <input type="text" id="newPoap_title" required />
             <br />
-      
             <label>URL de la Imagen:</label>
             <input type="text"  id="newPoap_image" required />
             <br />
-      
             <label htmlFor="description">Descripción:</label>
             <textarea name="newPoap_description" rows="4" ></textarea>
             <br />
-
             <label>Tipo de Certificado:</label>
             <select id="newPoap_tipoCertificado" >
               <option type="text" value="certificado">Certificado</option>
               <option value="poap">POAP</option>
             </select>
             <br />
-      
             <label>Tipo de Evento:</label>
             <select id="newPoap_tipoEvento" >
               <option value="virtual">Virtual</option>
               <option value="presencial">Presencial</option>
             </select>
             <br />
-      
             <label>URL del Evento:</label>
             <input type="url" id="newPoap_eventUrl" required/>
             <br />
-      
             <label>Ciudad del Evento:</label>
             <input type="text" id="newPoap_eventCity" required />
             <br />
-      
             <label>País del Evento:</label>
             <input type="text" id="newPoap_eventCountry" required />
             <br />
-      
             <label>Fecha del Evento:</label>
             <input type="text" id="newPoap_eventDate" required />
             <br />
-      
             <label>Límite de Emisiones:</label>
             <input type="number" id="newPoap_mintLimit" required />
             <br />
-      
             <label htmlFor="code">Código del Evento:</label>
             <input type="text" id="newPoap_code" required />
             <br />
-      
             <input
               type="button" // Cambia el tipo de "submit" a "button"
               value="Enviar"
@@ -247,7 +280,7 @@ class ICPoaps extends React.Component {
           <div className="container--formMintPoap">
           <h2 className="titleTextCenterContainer">Mint POAP</h2>
             <br />
-            <button className="btn-access-internetId" type="button">Use internet Identity</button>
+            <button className="btn-access-internetId" onClick={() => this.callInternetIdentity()} type="button">Use internet Identity</button>
             <br />
             <br />
             <label htmlFor="mintPoap">ID de poap:</label>
@@ -290,28 +323,23 @@ class ICPoaps extends React.Component {
             <input type="text" id="findPoapsMintedByUserID_wallet"/>
             <button onClick={() => this.findPoapsMintedByUserID()} className="btn--findPoapsMintedByUserID">Ver poaps</button>
             <br />
-
             <br />
-
             {/* Lista dinámica de datos de poaps */}
-          {this.state.poapsDataList.length > 0 ? (
-            <div className="container--findPoapData">
-              {this.state.poapsDataList.map((poapData, index) => (
-                <>
-                  <p>Título: {poapData.title}</p>
-                  <p>Minted: {poapData.minted.toString()}</p>
-                  <p>Is Online: {poapData.isOnline.toString()}</p>
-                </>
-              ))}
-            </div>
-          ) : (
-            <p></p>
+            {this.state.poapsDataList.length > 0 ? (
+              <div className="container--findPoapData">
+                {this.state.poapsDataList.map((poapData, index) => (
+                  <>
+                    <p>Título: {poapData.title}</p>
+                    <p>Minted: {poapData.minted.toString()}</p>
+                    <p>Is Online: {poapData.isOnline.toString()}</p>
+                  </>
+                ))}
+              </div>
+            ) : (
+              <p></p>
           )}
-
-
           </div>
         </div>
-
         <br className="Bigbr"/>
         <footer className="footer">
           <p className="footer--textCR">ICPoaps © 2023</p>

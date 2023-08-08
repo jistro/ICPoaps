@@ -124,19 +124,33 @@ input[type="submit"],
   width: 100%;
   display: inline-block;
   padding: 1rem 2rem;
-  background-color: #CF99FF;
   color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
   text-decoration: none;
   border-radius: 5px;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s;
+  background-image: linear-gradient(to right, #6A85F1, #C572EF, transparent);
+  background-color: hsla(272, 100%, 80%, 0.8);
+  background-size: 200px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.btn-access-internetId:hover {
+  background-image: linear-gradient(to right, #6A85F1, transparent), url('icpLogoW.png');
+  background-size: 200px;
+  background-position: left center;
+  background-color: #c17bff;
 }
 
 input[type="submit"]:hover,
 .btn--mint:hover,
 .btn--confrimSend:hover,
-.btn-access-internetId:hover,
 .btn--findPoapData:hover,
 .btn--findPoapsMintedByUserID:hover {
   background-color: #c17bff;
@@ -222,7 +236,8 @@ footer {
 
   .container--formNewPoap,
   .container--formMintPoap,
-  .container--findPoapData {
+  .container--findPoapData,
+  .container--findPoapsMintedByUserID {
     padding: 1rem;
   }
 
