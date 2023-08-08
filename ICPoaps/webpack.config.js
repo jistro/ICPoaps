@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
+
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const frontendDirectory = "ICPoaps_frontend";

@@ -4,8 +4,10 @@ import { ICPoaps_backend as canister } from "../../declarations/ICPoaps_backend"
 import { Actor, ActorMethod, HttpAgent } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import { Principal } from "@dfinity/principal";
+import { ethers } from 'ethers';
 
-const webapp_id = 'bd3sg-teaaa-aaaaa-qaaba-cai'
+
+const webapp_id = process.env.WHOAMI_CANISTER_ID;
 const webapp_idl = ({ IDL }) => {
   return IDL.Service({
     whoami: IDL.Func([], [IDL.Principal], ["query"]),
@@ -13,6 +15,7 @@ const webapp_idl = ({ IDL }) => {
     // ...
   });
 };
+const local_ii_url = `http://${process.env.INTERNET_IDENTITY_CANISTER_ID}.localhost:4943`;
 
 class ICPoaps extends React.Component {
   constructor(props) {
@@ -38,7 +41,7 @@ class ICPoaps extends React.Component {
     };
   }
 
-
+  
 
   async makeNewPoap() {
     let title = document.getElementById("newPoap_title")?.value;
@@ -94,48 +97,74 @@ class ICPoaps extends React.Component {
     });
   }
 
-
-async callInternetIdentity() {
-  
-  // First we have to create and AuthClient.
-  const authClient = await AuthClient.create();
-
-  // Call authClient.login(...) to login with Internet Identity. This will open a new tab
-  // with the login prompt. The code has to wait for the login process to complete.
-  // We can either use the callback functions directly or wrap in a promise.
-  await new Promise((resolve, reject) => {
-    authClient.login({
-      // cambia a https://identity.ic0.app para produccion 
-      identityProvider: "http://bnz7o-iuaaa-aaaaa-qaaaa-cai.localhost:4943", //"https://identity.ic0.app",
-      onSuccess: resolve,
-      onError: reject,
+  //llama a internet identity
+  async callInternetIdentity() {
+    let iiUrl;
+    if (process.env.DFX_NETWORK === "local") {
+      iiUrl = local_ii_url;
+    } else if (process.env.DFX_NETWORK === "ic") {
+      iiUrl = `https://${process.env.INTERNET_IDENTITY_CANISTER_ID}.ic0.app`;
+    } else {
+      // fall back to local
+      iiUrl = local_ii_url;
+    }
+    const authClient = await AuthClient.create();
+    await new Promise((resolve, reject) => {
+      authClient.login({
+        // cambia a https://identity.ic0.app para produccion 
+        //identityProvider: "http://bnz7o-iuaaa-aaaaa-qaaaa-cai.localhost:4943", //"https://identity.ic0.app",
+        identityProvider: iiUrl,
+        onSuccess: resolve,
+        onError: reject,
+      });
     });
-  });
-  // Get the identity from the auth client:
-  console.log("authClient");
-  const identity = authClient.getIdentity();
-  console.log(identity);
-  console.log("------------------");
-  console.log("agent");
-  // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
-  const agent = new HttpAgent({ identity });
-  console.log(agent);
-  console.log("------------------");
-  console.log("webapp_idl");
-  // Using the interface description of our webapp, we create an Actor that we use to call the service methods.
-  const webapp = Actor.createActor(webapp_idl, {
-    agent,
-    canisterId: webapp_id,
-  });
-  console.log(webapp);
-  console.log("------------------");
-  console.log("whoami");
-  // Call whoami which returns the principal (user id) of the current user.
-  const principal = await webapp.whoami();
-  console.log(principal);
-  console.log("------------------");
-  document.getElementById("mintPoap_wallet").value = principal.toString();
-}
+    // Get the identity from the auth client:
+    console.log("authClient");
+    const identity = authClient.getIdentity();
+    console.log(identity);
+    console.log("------------------");
+    console.log("meake agent");
+    // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
+    const agent = new HttpAgent({identity});
+    console.log(agent);
+    console.log("------------------");
+    console.log("createActor");
+    // Using the interface description of our webapp, we create an Actor that we use to call the service methods.
+    const webapp = Actor.createActor(webapp_idl, {
+      agent,
+      canisterId: webapp_id,
+    });
+    console.log(webapp);
+    console.log("------------------");
+    console.log("whoami");
+    // Call whoami which returns the principal (user id) of the current user.
+    //const principal = await webapp.whoami();
+    const principal = await webapp.whoami();
+    console.log(principal);
+    console.log("------------------");
+    document.getElementById("mintPoap_wallet").value = principal.toString();
+  }
+
+  //llama a metamask
+  async callEVMWallet() {
+    console.log('Requesting account...');
+
+    if(window.ethereum) {
+      console.log('detected');
+
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        console.log(accounts);
+        console.log('Connected', accounts[0]);
+        document.getElementById("mintPoap_wallet").value = accounts[0].toString();
+      } catch (error) {
+        console.log('Error connecting...');
+      }
+
+    } else {
+      alert('Meta Mask not detected');
+    }
+  }
 
   async mintPoap() {
     let id = document.getElementById("mintPoap_id")?.value;
@@ -281,6 +310,7 @@ async callInternetIdentity() {
           <h2 className="titleTextCenterContainer">Mint POAP</h2>
             <br />
             <button className="btn-access-internetId" onClick={() => this.callInternetIdentity()} type="button">Use internet Identity</button>
+            <button className="btn-access-metamask" onClick={() => this.callEVMWallet()} type="button">Use Metamask</button>
             <br />
             <br />
             <label htmlFor="mintPoap">ID de poap:</label>

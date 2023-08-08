@@ -124,7 +124,7 @@ input[type="submit"],
   width: 100%;
   display: inline-block;
   padding: 1rem 2rem;
-  color: #fff;
+  color: #747474;
   font-size: 1.2rem;
   font-weight: bold;
   text-decoration: none;
@@ -142,10 +142,42 @@ input[type="submit"],
 
 
 .btn-access-internetId:hover {
+  color: #fff;
   background-image: linear-gradient(to right, #6A85F1, transparent), url('icpLogoW.png');
-  background-size: 200px;
+  background-size: 140px;
   background-position: left center;
   background-color: #c17bff;
+}
+
+
+
+.btn-access-metamask {
+  width: 100%;
+  display: inline-block;
+  padding: 1rem 2rem;
+  color: #c48e18;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  background-image: linear-gradient(to right, #f1ab6a, #efd272, transparent);
+  background-color: hsla(39, 100%, 80%, 0.8);
+  background-size: 200px;
+  background-repeat: no-repeat;
+  background-position: left center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.btn-access-metamask:hover {
+  color: #fff1d4;
+  background-image: linear-gradient(to right, #f1ab6a, transparent), url('MetaMask_Fox.svg');
+  background-size: 150px;
+  background-position: left center;
+  background-color: #f1ab6a;
 }
 
 input[type="submit"]:hover,
