@@ -11,8 +11,6 @@ const webapp_id = process.env.WHOAMI_CANISTER_ID;
 const webapp_idl = ({ IDL }) => {
   return IDL.Service({
     whoami: IDL.Func([], [IDL.Principal], ["query"]),
-    // Define other methods in the interface as well
-    // ...
   });
 };
 const local_ii_url = `http://${process.env.INTERNET_IDENTITY_CANISTER_ID}.localhost:4943`;
@@ -60,24 +58,18 @@ class ICPoaps extends React.Component {
       alert("Por favor, complete todos los campos");
       return;
     }
+
+    
+    console.log("Preparing data to send...");
+    eventDate = eventDate.toString();
     let isOnline= tipoEvento === "virtual" ? true : false;
     let isCertification= tipoCertificado === "certificado" ? true : false;
-
     if (mintLimit && !isNaN(mintLimit) && parseInt(mintLimit) >= 0) {
       mintLimit = parseInt(mintLimit);
     } else {
       mintLimit = 0; 
     }
-    //only for test
-    console.log("accss");
-    console.log(
-      title, code, 
-      isOnline, description,
-      isCertification,
-      mintLimit, eventCountry,
-      image, eventUrl,
-      eventCity, eventDate
-    );
+
     canister.newPoap({
       title,
       code, 
@@ -95,6 +87,7 @@ class ICPoaps extends React.Component {
       const poapId = parseInt(result);
       this.setState({ poapId });
     });
+    console.log("Data sent");
   }
 
   //llama a internet identity
@@ -103,55 +96,40 @@ class ICPoaps extends React.Component {
     if (process.env.DFX_NETWORK === "local") {
       iiUrl = local_ii_url;
     } else if (process.env.DFX_NETWORK === "ic") {
+      //llama a https://identity.ic0.app
       iiUrl = `https://${process.env.INTERNET_IDENTITY_CANISTER_ID}.ic0.app`;
     } else {
-      // fall back to local
       iiUrl = local_ii_url;
     }
     const authClient = await AuthClient.create();
-    await new Promise((resolve, reject) => {
+    console.log("Calling Internet Identity...");
+    await new Promise((resolve) => {
       authClient.login({
-        // cambia a https://identity.ic0.app para produccion 
-        //identityProvider: "http://bnz7o-iuaaa-aaaaa-qaaaa-cai.localhost:4943", //"https://identity.ic0.app",
         identityProvider: iiUrl,
         onSuccess: resolve,
-        onError: reject,
+        onError: () => {
+          alert('Login error');
+        },
       });
     });
-    // Get the identity from the auth client:
-    console.log("authClient");
     const identity = authClient.getIdentity();
-    console.log(identity);
-    console.log("------------------");
-    console.log("meake agent");
-    // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
     const agent = new HttpAgent({identity});
-    console.log(agent);
-    console.log("------------------");
-    console.log("createActor");
-    // Using the interface description of our webapp, we create an Actor that we use to call the service methods.
     const webapp = Actor.createActor(webapp_idl, {
       agent,
       canisterId: webapp_id,
     });
-    console.log(webapp);
-    console.log("------------------");
-    console.log("whoami");
-    // Call whoami which returns the principal (user id) of the current user.
-    //const principal = await webapp.whoami();
     const principal = await webapp.whoami();
-    console.log(principal);
+    console.log("Get identity");
     console.log("------------------");
+    console.log("Internet Identity: ", principal.toString());
     document.getElementById("mintPoap_wallet").value = principal.toString();
   }
 
   //llama a metamask
   async callEVMWallet() {
     console.log('Requesting account...');
-
     if(window.ethereum) {
       console.log('detected');
-
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         console.log(accounts);
@@ -160,23 +138,33 @@ class ICPoaps extends React.Component {
       } catch (error) {
         console.log('Error connecting...');
       }
-
     } else {
       alert('Meta Mask not detected');
     }
   }
 
   async mintPoap() {
+    console.log("checking data for minting...");
     let id = document.getElementById("mintPoap_id")?.value;
     let code = document.getElementById("mintPoap_password")?.value;
     let user = document.getElementById("mintPoap_wallet")?.value;
     console.log(id, code, user);
-    canister.mintPoap({code, id, user}).then((result) => {
+    
+    try {
+      const result = await canister.mintPoap({ code, id, user });
       console.log(result);
       const poapMintedNumber = parseInt(result);
       this.setState({ poapMintedNumber });
-    });
+    } catch (error) {
+      console.error(error);
+      if (error.message.includes("POAP not found")) {
+        alert("Error: POAP not found");
+      } else {
+        alert("An error occurred while minting POAP.");
+      }
+    }
   }
+  
 
   async findPoapDataById() {
     let id = document.getElementById("findPoapData_id").value;
@@ -185,7 +173,6 @@ class ICPoaps extends React.Component {
     try {
       const opt_metadataPOAPForUser = await canister.getPoapInfo(id);
       console.log(opt_metadataPOAPForUser);
-      // ...otros console.log para las otras variables
       console.log("saved in state");
       console.log(opt_metadataPOAPForUser.title);
 
@@ -257,43 +244,43 @@ class ICPoaps extends React.Component {
         <div className="container--twoSideByside">
           <div className="container--formNewPoap">
           <h2 className="titleTextCenterContainer">Make POAP</h2>
-            <label>Título:</label>
+            <label>Title:</label>
             <input type="text" id="newPoap_title" required />
             <br />
-            <label>URL de la Imagen:</label>
+            <label>Image URL:</label>
             <input type="text"  id="newPoap_image" required />
             <br />
-            <label htmlFor="description">Descripción:</label>
+            <label htmlFor="description">Description:</label>
             <textarea name="newPoap_description" rows="4" ></textarea>
             <br />
-            <label>Tipo de Certificado:</label>
+            <label>Certificate Type:</label>
             <select id="newPoap_tipoCertificado" >
-              <option type="text" value="certificado">Certificado</option>
+              <option type="text" value="certificado">Certification</option>
               <option value="poap">POAP</option>
             </select>
             <br />
-            <label>Tipo de Evento:</label>
+            <label>Event Type:</label>
             <select id="newPoap_tipoEvento" >
               <option value="virtual">Virtual</option>
-              <option value="presencial">Presencial</option>
+              <option value="presencial">IRL</option>
             </select>
             <br />
-            <label>URL del Evento:</label>
+            <label>Event URL:</label>
             <input type="url" id="newPoap_eventUrl" required/>
             <br />
-            <label>Ciudad del Evento:</label>
+            <label>Event City:</label>
             <input type="text" id="newPoap_eventCity" required />
             <br />
-            <label>País del Evento:</label>
+            <label>Event Country:</label>
             <input type="text" id="newPoap_eventCountry" required />
             <br />
-            <label>Fecha del Evento:</label>
-            <input type="text" id="newPoap_eventDate" required />
+            <label>Event Date:</label>
+            <input type="date" id="newPoap_eventDate" required />
             <br />
-            <label>Límite de Emisiones:</label>
+            <label>Mint limit:</label>
             <input type="number" id="newPoap_mintLimit" required />
             <br />
-            <label htmlFor="code">Código del Evento:</label>
+            <label htmlFor="code">Password or correct answer:</label>
             <input type="text" id="newPoap_code" required />
             <br />
             <input
@@ -307,49 +294,49 @@ class ICPoaps extends React.Component {
             </div>
           </div>
           <div className="container--formMintPoap">
-          <h2 className="titleTextCenterContainer">Mint POAP</h2>
+          <h2 className="titleTextCenterContainer">Mint POAP or Certification</h2>
             <br />
             <button className="btn-access-internetId" onClick={() => this.callInternetIdentity()} type="button">Use internet Identity</button>
             <button className="btn-access-metamask" onClick={() => this.callEVMWallet()} type="button">Use Metamask</button>
             <br />
             <br />
-            <label htmlFor="mintPoap">ID de poap:</label>
+            <label htmlFor="mintPoap">POAP or certification ID:</label>
             <input type="text" id="mintPoap_id"/>
             <br />
-            <label htmlFor="mintPoap">Código del Evento (en caso de contar con uno):</label>
+            <label htmlFor="mintPoap">Event Code (if applicable):</label>
             <input type="text" id="mintPoap_password"/>
             <br />
-            <label htmlFor="mintPoap">Dirección de la billetera:</label>
+            <label htmlFor="mintPoap">Internet Identity or EVM wallet address:</label>
             <input type="text" id="mintPoap_wallet"/>
             <br />
             <button onClick={() => this.mintPoap()} className="btn--mint">Mintear</button>
             <div>
-                {this.state.poapMintedNumber !== 0 && (<h2>POAP minteado: {this.state.poapMintedNumber}</h2>)}
+                {this.state.poapMintedNumber !== 0 && (<><h2>Got it</h2> Claimed: {this.state.poapMintedNumber}</>)}
             </div>
           </div>
         </div>
         <div className="container--twoSideByside">
           <div className="container--findPoapData" >
-            <h2 className="titleTextCenterContainer">Ver datos de Poap</h2>
-            <label >ID de poap:</label>
+            <h2 className="titleTextCenterContainer">View POAP or certification info</h2>
+            <label>POAP/certification ID:</label>
             <input type="text" id="findPoapData_id"/>
-            <button onClick={() => this.findPoapDataById()} className="btn--findPoapData">Ver datos</button>
+            <button onClick={() => this.findPoapDataById()} className="btn--findPoapData">View Data</button>
             <br />
-            {this.state.metadataPoapFinded.title !== "" && (<h1>{this.state.metadataPoapFinded.title}</h1>)}
-            {this.state.metadataPoapFinded.isOnline !== false && (<p>Evento online</p>)}
-            {this.state.metadataPoapFinded.isCertification !== false && (<p>Es un certificado</p>)}
-            {this.state.metadataPoapFinded.minted !== 0 && (<p>Reclamados: {parseInt(this.state.metadataPoapFinded.minted)}</p>)}
-            {this.state.metadataPoapFinded.description !== "" && (<p>Descripción: {this.state.metadataPoapFinded.description}</p>)}
-            {this.state.metadataPoapFinded.mintLimit !== 0 && (<p>Límite de Emisiones: {parseInt(this.state.metadataPoapFinded.mintLimit)}</p>)}
-            {this.state.metadataPoapFinded.eventCountry !== "" && (<p>País del Evento: {this.state.metadataPoapFinded.eventCountry}</p>)}
-            {this.state.metadataPoapFinded.image !== "" && (<p>Imagen: {this.state.metadataPoapFinded.image}</p>)}
-            {this.state.metadataPoapFinded.eventUrl !== "" && (<p>URL del Evento: {this.state.metadataPoapFinded.eventUrl}</p>)}
-            {this.state.metadataPoapFinded.eventCity !== "" && (<p>Ciudad del Evento: {this.state.metadataPoapFinded.eventCity}</p>)}
-            {this.state.metadataPoapFinded.eventDate !== "" && (<p>Fecha del Evento: {this.state.metadataPoapFinded.eventDate}</p>)}
+              {this.state.metadataPoapFinded.title !== "" && (<h1>{this.state.metadataPoapFinded.title}</h1>)}
+              {this.state.metadataPoapFinded.isOnline !== false && (<p>Online Event</p>)}
+              {this.state.metadataPoapFinded.isCertification !== false && (<p>Certification</p>)}
+              {this.state.metadataPoapFinded.minted !== 0 && (<p>Claimed: {parseInt(this.state.metadataPoapFinded.minted)}</p>)}
+              {this.state.metadataPoapFinded.description !== "" && (<p>Description: {this.state.metadataPoapFinded.description}</p>)}
+              {this.state.metadataPoapFinded.mintLimit !== 0 && (<p>Mint Limit: {parseInt(this.state.metadataPoapFinded.mintLimit)}</p>)}
+              {this.state.metadataPoapFinded.eventCountry !== "" && (<p>Event Country: {this.state.metadataPoapFinded.eventCountry}</p>)}
+              {this.state.metadataPoapFinded.image !== "" && (<p>Image: {this.state.metadataPoapFinded.image}</p>)}
+              {this.state.metadataPoapFinded.eventUrl !== "" && (<p>Event URL: {this.state.metadataPoapFinded.eventUrl}</p>)}
+              {this.state.metadataPoapFinded.eventCity !== "" && (<p>Event City: {this.state.metadataPoapFinded.eventCity}</p>)}
+              {this.state.metadataPoapFinded.eventDate !== "" && (<p>Event Date: {this.state.metadataPoapFinded.eventDate}</p>)}
           </div>
           <div className="container--findPoapsMintedByUserID" >
-            <h2 className="titleTextCenterContainer">Ver tus poaps</h2>
-            <label >Dirección de la billetera/internetID:</label>
+            <h2 className="titleTextCenterContainer">View your POAPs</h2>
+            <label >Internet Identity or EVM wallet address:</label>
             <input type="text" id="findPoapsMintedByUserID_wallet"/>
             <button onClick={() => this.findPoapsMintedByUserID()} className="btn--findPoapsMintedByUserID">Ver poaps</button>
             <br />
@@ -359,9 +346,10 @@ class ICPoaps extends React.Component {
               <div className="container--findPoapData">
                 {this.state.poapsDataList.map((poapData, index) => (
                   <>
-                    <p>Título: {poapData.title}</p>
+                    <h1>Title: {poapData.title}</h1>
                     <p>Minted: {poapData.minted.toString()}</p>
-                    <p>Is Online: {poapData.isOnline.toString()}</p>
+                    {poapData.isOnline !== false && (<p>Online Event</p>)}
+                    {poapData.isCertification !== false && (<p>Certification</p>)}
                   </>
                 ))}
               </div>

@@ -24,15 +24,16 @@ h2 {
 }
 
 /* Estilos para la barra de navegación */
+
 nav {
   background: #CF99FF;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   padding: 1rem 2rem;
   color: #fff;
   display: flex;
   align-items: center;
   margin: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .logoICPoaps {
@@ -67,12 +68,11 @@ nav {
 .container--findPoapsMintedByUserID {
   flex: 1;
   max-width: 600px;
-  margin: 15px;
-  padding: 4rem;
-  border: 1px solid #d9c2db;
-  border-radius: 10px;
-  background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 input[type="text"],
@@ -81,6 +81,15 @@ textarea,
 select,
 input[type="number"],
 input[type="url"] {
+  width: 100%;
+  padding: .5rem;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+input[type="date"] {
   width: 100%;
   padding: .5rem;
   margin-bottom: 15px;
@@ -124,7 +133,7 @@ input[type="submit"],
   width: 100%;
   display: inline-block;
   padding: 1rem 2rem;
-  color: #747474;
+  color: #ffffff;
   font-size: 1.2rem;
   font-weight: bold;
   text-decoration: none;
@@ -142,7 +151,7 @@ input[type="submit"],
 
 
 .btn-access-internetId:hover {
-  color: #fff;
+  color: #ede3ff;
   background-image: linear-gradient(to right, #6A85F1, transparent), url('icpLogoW.png');
   background-size: 140px;
   background-position: left center;
@@ -155,7 +164,7 @@ input[type="submit"],
   width: 100%;
   display: inline-block;
   padding: 1rem 2rem;
-  color: #c48e18;
+  color: #c7880a;
   font-size: 1.2rem;
   font-weight: bold;
   text-decoration: none;
