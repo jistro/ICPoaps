@@ -4,6 +4,12 @@ Bienvenido al repositorio de ICPoap (**I**nternet **C**omputer **P**OAP) impleme
 ICPoap es un proyecto de código abierto que permite a los usuarios de Internet Computer crear y distribuir POAPs (Proof of Attendance Protocol) en la red de Internet Computer.
 
 ![](./README_assets/line.png)
+
+## Documentacion
+Encuentra la documentacion oficial en 
+
+[https://jistro.gitbook.io/icpoaps-documentacion/](https://jistro.gitbook.io/icpoaps-documentacion/)
+
 ## ¿Qué es POAP?
 Un POAP (Proof of Attendance Protocol) es un token no fungible (NFT) que sirve como prueba de asistencia o participación en un evento específico. Este protocolo utiliza la tecnología blockchain para certificar y registrar de manera inmutable la presencia de una persona en eventos como conferencias, festivales, meetups, competiciones deportivas, entre otros.
 
