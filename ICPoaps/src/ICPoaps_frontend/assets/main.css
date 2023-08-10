@@ -67,7 +67,7 @@ nav {
 .container--findPoapData,
 .container--findPoapsMintedByUserID {
   flex: 1;
-  max-width: 600px;
+  max-width: auto;
   margin: 10px;
   padding: 1rem;
   border-radius: 8px;
@@ -242,6 +242,13 @@ footer {
   padding: 0px;
 }
 
+.img--poapImage {
+  width: 200px;
+  height: auto;
+  margin: 0;
+  padding: 0px;
+}
+
 /* Estilos para dispositivos móviles */
 @media (max-width: 768px) {
   .container--twoSideByside {
@@ -318,6 +325,12 @@ footer {
   
   .motokoImg {
     width: 50px;
+    height: auto;
+    margin: 0;
+    padding: 0px;
+  }
+  .img--poapImage {
+    width: 150px;
     height: auto;
     margin: 0;
     padding: 0px;

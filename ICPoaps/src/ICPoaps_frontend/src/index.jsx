@@ -323,13 +323,13 @@ class ICPoaps extends React.Component {
             <button onClick={() => this.findPoapDataById()} className="btn--findPoapData">View Data</button>
             <br />
               {this.state.metadataPoapFinded.title !== "" && (<h1>{this.state.metadataPoapFinded.title}</h1>)}
+              {this.state.metadataPoapFinded.image !== "" && (<img src={this.state.metadataPoapFinded.image} alt="POAP image" className="img--poapImage"/>)}
               {this.state.metadataPoapFinded.isOnline !== false && (<p>Online Event</p>)}
               {this.state.metadataPoapFinded.isCertification !== false && (<p>Certification</p>)}
               {this.state.metadataPoapFinded.minted !== 0 && (<p>Claimed: {parseInt(this.state.metadataPoapFinded.minted)}</p>)}
               {this.state.metadataPoapFinded.description !== "" && (<p>Description: {this.state.metadataPoapFinded.description}</p>)}
               {this.state.metadataPoapFinded.mintLimit !== 0 && (<p>Mint Limit: {parseInt(this.state.metadataPoapFinded.mintLimit)}</p>)}
               {this.state.metadataPoapFinded.eventCountry !== "" && (<p>Event Country: {this.state.metadataPoapFinded.eventCountry}</p>)}
-              {this.state.metadataPoapFinded.image !== "" && (<p>Image: {this.state.metadataPoapFinded.image}</p>)}
               {this.state.metadataPoapFinded.eventUrl !== "" && (<p>Event URL: {this.state.metadataPoapFinded.eventUrl}</p>)}
               {this.state.metadataPoapFinded.eventCity !== "" && (<p>Event City: {this.state.metadataPoapFinded.eventCity}</p>)}
               {this.state.metadataPoapFinded.eventDate !== "" && (<p>Event Date: {this.state.metadataPoapFinded.eventDate}</p>)}
@@ -347,6 +347,7 @@ class ICPoaps extends React.Component {
                 {this.state.poapsDataList.map((poapData, index) => (
                   <>
                     <h1>Title: {poapData.title}</h1>
+                    {poapData.image !== "" && (<img src={poapData.image} alt="POAP image" className="img--poapImage"/>)}
                     <p>Minted: {poapData.minted.toString()}</p>
                     {poapData.isOnline !== false && (<p>Online Event</p>)}
                     {poapData.isCertification !== false && (<p>Certification</p>)}
