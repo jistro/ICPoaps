@@ -96,8 +96,8 @@ class ICPoaps extends React.Component {
     if (process.env.DFX_NETWORK === "local") {
       iiUrl = local_ii_url;
     } else if (process.env.DFX_NETWORK === "ic") {
-      //llama a https://identity.ic0.app
-      iiUrl = `https://${process.env.INTERNET_IDENTITY_CANISTER_ID}.ic0.app`;
+      //llama a 
+      iiUrl = `https://identity.ic0.app`;
     } else {
       iiUrl = local_ii_url;
     }
